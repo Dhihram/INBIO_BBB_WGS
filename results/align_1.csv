@@ -1,0 +1,9 @@
+Metric,Value,Percentage
+Total reads,"44,823,172",100%
+Primary reads,"44,821,894",100.00%
+Supplementary alignments,"1,278",0.00%
+Mapped reads,"245,815",0.55%
+Primary mapped reads,"244,537",0.55%
+Paired-end reads,"44,821,894",100%
+Properly paired,"242,094",0.54%
+Singleton reads,"1,875",0.00%

@@ -1,0 +1,25 @@
+44823172 + 0 in total (QC-passed reads + QC-failed reads)
+44821894 + 0 primary
+0 + 0 secondary
+1278 + 0 supplementary
+0 + 0 duplicates
+0 + 0 primary duplicates
+245815 + 0 mapped (0.55% : N/A)
+244537 + 0 primary mapped (0.55% : N/A)
+44821894 + 0 paired in sequencing
+22410947 + 0 read1
+22410947 + 0 read2
+242094 + 0 properly paired (0.54% : N/A)
+242662 + 0 with itself and mate mapped
+1875 + 0 singletons (0.00% : N/A)
+18 + 0 with mate mapped to a different chr
+18 + 0 with mate mapped to a different chr (mapQ>=5)
+#rname	startpos	endpos	numreads	covbases	coverage	meandepth	meanbaseq	meanmapq
+NC_007357.1	1	2341	8990	2313	98.8039	566.753	34.6	59.9
+NC_007358.1	1	2341	19762	2323	99.2311	1230.9	34.6	59.9
+NC_007359.1	1	2233	7035	2218	99.3283	463.119	34.6	59.9
+NC_007362.1	1	1760	43678	1754	99.6591	3675.95	34.7	60
+NC_007360.1	1	1565	93260	1551	99.1054	8759.12	34.6	59.9
+NC_007361.1	1	1458	3830	1366	93.69	369.069	34.7	59.7
+NC_007363.1	1	1027	57378	1015	98.8315	8184.21	34.6	60
+NC_007364.1	1	865	11882	342	39.5376	1194.89	35.2	54.5

@@ -1,0 +1,376 @@
+---
+title: "Report INBIOS BBB WGS "
+author: "Dhihram Tenrisau"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, warning = FALSE, message = FALSE, echo=FALSE}
+library(tidyverse)
+library(knitr)
+library(dplyr)
+library(lubridate)
+library(kableExtra)
+```
+
+## Abstract
+
+**Background**: Avian influenza A(H5N1) poses a persistent public health threat due to its potential for zoonotic spillover from animals to humans. Understanding the molecular adaptations that facilitate this transition is critical for pandemic preparedness. **Methods**: We performed a comprehensive genomic analysis of a human H5N1 isolate using a bioinformatic pipeline, including sequence trimming, alignment to an avian reference (A/goose/Guangdong/1/1996), variant calling, and functional annotation. This analysis aimed to identify genetic variations associated with viral fitness, mammalian adaptation, and zoonotic potential. **Results**: Despite a low mapping rate characteristic of clinical samples, high-depth coverage revealed key adaptive mutations. Notable findings include the E627K substitution in the PB2 gene and moderate-impact mutations in the Hemagglutinin (HA) gene, including G228A and a clustered H154Q/R156K mutation. **Conclusion**: These findings suggest that the virus has undergone significant functional tuning in both its receptor-binding and replication machinery, highlighting the adaptive mechanisms that facilitate H5N1 spillover and replication within human hosts.
+
+## Background
+
+Avian Influenza (A H5N1) became one of the public health concern. This virus first emerged in 1996 and have been causing outbreaks in wild birds and poultry.[^1] As of 1 March 2026, nine additional human cases of A(H5N1) virus infections from Bangladesh and Cambodia. The majority of reported human infections have been associated with exposure to infected animals in poultry and wildlife. [^2]
+
+[^1]: WHO, <https://www.who.int/teams/global-influenza-programme/avian-influenza/avian-a-h5n1-virus>
+
+[^2]: [https://cdn.who.int/media/docs/default-source/influenza/human-animal-interface-risk-assessments/updated-joint-fao-who-woah-public-health-assessment-of-recent-high-pathogenicity-avian-influenza-a(h5)-virus-events-in-animals-and-people--18-may-2026.pdf?sfvrsn=d660ff84_1&download=true](https://cdn.who.int/media/docs/default-source/influenza/human-animal-interface-risk-assessments/updated-joint-fao-who-woah-public-health-assessment-of-recent-high-pathogenicity-avian-influenza-a(h5)-virus-events-in-animals-and-people--18-may-2026.pdf?sfvrsn=d660ff84_1&download=true){.uri}
+
+This study aims to perform a comprehensive genomic analysis of a human A(H5N1) case by mapping its sequences to the reference strain GCF_000864105.1 (A/goose/Guangdong/1/1996(H5N1)). By identifying and annotating viral variants, we intend to characterize the genetic divergence of this isolate and identify key mutations in mammalian, potential adaptation, and potential changes in viral fitness.
+
+## Method
+
+### Data Acqusition
+
+Whole-genome sequencing (WGS) data were downloaded from the NCBI Sequence Read Archive (SRA) under accession SRR35082533 using the SRA Toolkit (`prefetch` and `fasterq-dump`). The downloaded `.sra` file was converted into paired-end FASTQ files, consisting of forward (R1) and reverse (R2) reads.
+
+### Initial Quality Control
+
+The downloaded WGS data undergoes quality control using fastqc, followed by an aggregated quality control assessment using `multiqc`.
+
+### Read Trimming
+
+The data is then trimmed to clean the reads from adapters and low-quality bases. Trimming is performed twice using stricter parameters (excluding reads with a length of less than 50).
+
+### Post-Trimming Quality Control
+
+The trimmed sequences are evaluated again using `fastqc` and `multiqc`. The best trimming results will be used for the subsequent steps in the pipeline. Download Reference and Indexing
+
+The reference genome is retrieved from NCBI using the RefSeq ID: GCF_000864105.1 and is then renamed to `reference.fna` for indexing.
+
+### Alignment / Mapping
+
+The cleaned reads from the trimming step are mapped and aligned to the `reference.fna` file. SAM to BAM Conversion, Sorting, and Indexing
+
+The alignment results, initially in SAM format, are converted into BAM format. Next, the file is sorted and indexed to create a `.bai` file, allowing the BAM file to be read quickly by downstream tools.
+
+### Alignment Quality Control
+
+Next, an assessment is performed to check the percentage of mapped reads and the read coverage for each segment/reference.
+
+### Variant calling
+
+Variant calling is performed to identify differences between the sample and the reference genome. This outputs a `variants_raw.vcf` file using the following parameters:
+
+-   `min-mapping-quality 20`: Includes only reads with sufficiently good mapping quality
+
+-   `min-base-quality 20`: Includes only bases with sufficiently good quality
+
+-   `min-coverage 10`: Variants are only called if the coverage is at least 10x
+
+Subsequently, variant filtering is performed to remove variants based on the following parameters:
+
+-   `QUAL < 30`: Filters out low-quality variants
+
+-   `DP < 10`: Filters out low depth/coverage
+
+-   `AF < 0.1`: Filters out allele frequencies of \< 10%
+
+**Customizing SnpEff Database:**
+
+The `.gbff` data file is downloaded for the NCBI reference GCF_000864105.1. The database is then customized for H5N1 by copying the `.fna` and `.gbff` files into the H5N1 directory within the SnpEff configuration.
+
+### Annotate variants
+
+SnpEff is used to perform variant annotation to identify: synonymous variants, missense variants, stop-gained mutations, mutation positions within the gene, amino acid changes, and affected genes.
+
+## Results
+
+### QC Pre-Post Trimming
+
+```{r, warning = FALSE, message = FALSE, echo=FALSE}
+setwd("C:/Users/dhihr/OneDrive/Inbio BBB WGS 2026")
+ta_1 <- read.csv('qc_trim2.csv') %>% select(-Keterangan)
+colnames(ta_1) <- gsub("\\.", "", colnames(ta_1))
+
+ta_1 %>% kable(
+    format = "html",
+    caption = "Table 1. Summary of sequencing quality before and after trimming I",
+    align = c("l", "r", "r", "r")
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = FALSE,
+    position = "center",
+    font_size = 12
+  ) %>%
+  column_spec(1, bold = TRUE) %>%
+  row_spec(0, bold = TRUE, background = "#D9EAF7")
+```
+
+```{r, warning = FALSE, message = FALSE, echo=FALSE}
+setwd("C:/Users/dhihr/OneDrive/Inbio BBB WGS 2026")
+ta_2 <- read.csv('qc_trim.csv') %>% select(-Interpretasi)
+colnames(ta_2) <- gsub("\\.", " ", colnames(ta_2))
+
+ta_2_fmt <- ta_2
+
+status_cols <- c(
+  "Per base quality",
+  "Adapter content",
+  "Per base content",
+  "Length Distribution",
+  "Duplication"
+)
+
+ta_2_fmt[status_cols] <- lapply(ta_2_fmt[status_cols], function(x){
+
+  cell_spec(
+    x,
+    bold = TRUE,
+    color = "white",
+    background = case_when(
+      x == "PASS"    ~ "#28A745",   # hijau
+      x == "WARNING" ~ "#FFC107",   # kuning
+      x == "WARN"    ~ "#FFC107",   # jika output FastQC menggunakan WARN
+      x == "FAIL"    ~ "#DC3545",   # merah
+      TRUE           ~ "white"
+    )
+  )
+
+})
+
+ta_2_fmt %>%
+  kable(
+    format = "html",
+    escape = FALSE,      # WAJIB agar warna muncul
+    caption = "Table 2. Summary of sequencing quality before and after trimming II"
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = FALSE,
+    position = "center",
+    font_size = 12
+  ) %>%
+  column_spec(1, bold = TRUE) %>%  
+  row_spec(0, bold = TRUE, background = "#D9EAF7")
+```
+
+The quality assessment indicated that no adapter contamination was detected in the raw sequencing data; therefore, trimming did not result in a significant improvement in read quality. Based on the `fastp` report, the raw reads had already undergone adapter trimming, and the `FastQC` results showed that the read length and overall sequence quality were retained. Consequently, the raw sequencing data were used for the subsequent alignment and variant analysis.
+
+### Aligmnment
+
+```{r, warning = FALSE, message = FALSE, echo=FALSE}
+setwd("C:/Users/dhihr/OneDrive/Inbio BBB WGS 2026")
+ta_3 <- read.csv('align_1.csv')
+colnames(ta_3) <- gsub("\\.", "", colnames(ta_3))
+
+ta_3 %>% kable(
+    format = "html",
+    caption = "Table 3. Alignment Summary"
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = FALSE,
+    position = "center",
+    font_size = 12
+  ) %>%
+  column_spec(1, bold = TRUE) %>%
+  row_spec(0, bold = TRUE, background = "#D9EAF7")
+```
+
+```{r, warning = FALSE, message = FALSE, echo=FALSE}
+setwd("C:/Users/dhihr/OneDrive/Inbio BBB WGS 2026")
+ta_4 <- read.csv('align_2.csv')
+colnames(ta_3) <- gsub("\\.", "", colnames(ta_3))
+
+ta_4 %>% kable(
+    format = "html",
+    caption = "Table 4. Genome coverage and depth per region"
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = FALSE,
+    position = "center",
+    font_size = 12
+  ) %>%
+  column_spec(2, bold = TRUE) %>%
+  row_spec(0, bold = TRUE, background = "#D9EAF7")
+```
+
+A total of 44.8 million paired-end reads were generated, with 245,815 reads (0.55%) successfully mapped to the influenza A (H5N1) reference genome. Despite the low mapping rate, seven genome segments showed \>93% coverage with high mean sequencing depths ranging from 369× to 8,759× and excellent mapping quality (mean MAPQ = 60). The HA segment had the highest genome coverage (99.66%), while the NS segment showed the lowest genome coverage (39.54%).
+
+### Variant Analysis
+
+```{r, warning = FALSE, message = FALSE, echo=FALSE}
+setwd("C:/Users/dhihr/OneDrive/Inbio BBB WGS 2026")
+ta_5 <- read.csv('variant_1.csv')
+colnames(ta_5) <- gsub("\\.", "", colnames(ta_5))
+
+ta_5 %>% kable(
+    format = "html",
+    caption = "Table 5. Summary of variant detection"
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = FALSE,
+    position = "center",
+    font_size = 12
+  ) %>%
+  column_spec(1, bold = TRUE) %>%
+  row_spec(0, bold = TRUE, background = "#D9EAF7")
+```
+
+```{r, warning = FALSE, message = FALSE, echo=FALSE}
+setwd("C:/Users/dhihr/OneDrive/Inbio BBB WGS 2026")
+ta_6 <- read.csv('variant_2.csv')
+colnames(ta_6) <- gsub("\\.", " ", colnames(ta_6))
+
+ta_6 %>% kable(
+    format = "html",
+    caption = "Table 6. Variant Distribution per Genes"
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = FALSE,
+    position = "center",
+    font_size = 12
+  ) %>%
+  column_spec(2, bold = TRUE) %>%
+  row_spec(0, bold = TRUE, background = "#D9EAF7")
+```
+
+The distribution of variants varied considerably across the different viral segments. In terms of absolute numbers, the polymerase complex genes accumulated the most mutations, with PB1 and PB2 containing 114 and 109 variants, respectively. However, when normalized for gene length, the Hemagglutinin (HA) gene exhibited the highest mutation density at 1 variant per 18 bp. Conversely, the Non-structural (NS) gene was the most conserved segment in this dataset, demonstrating the lowest variant density at 1 variant per 54 bp (Table 6).
+
+```{r, warning = FALSE, message = FALSE, echo=FALSE}
+setwd("C:/Users/dhihr/OneDrive/Inbio BBB WGS 2026")
+ta_7 <- read.csv('variant_3.csv')
+
+
+ta_7_colored <- ta_7 %>%
+  mutate(
+    Impact = cell_spec(
+      Impact,
+      color = "white",
+      bold = TRUE,
+      background = case_when(
+        Impact == "LOW" ~ "#4CAF50",       
+        Impact == "MODERATE" ~ "#F39C12",  
+        Impact == "MODIFIER" ~ "#3498DB", 
+        TRUE ~ "gray"
+      )
+    )
+  )
+
+ta_7_colored %>%
+  kable(
+    format = "html",
+    escape = FALSE,
+    caption = "Table 7. Variant impact distribution"
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = FALSE,
+    position = "center",
+    font_size = 12
+  ) %>%
+  row_spec(0, bold = TRUE, background = "#D9EAF7")
+```
+
+Functional annotation performed using SnpEff revealed that the majority of variant effects were classified as having a LOW (52.30%) or MODIFIER (30.27%) impact. Variants categorized as having a MODERATE impact which predominantly include missense mutations capable of altering the protein structure—accounted for 17.43% (n=167) of the total annotated effects (Table 7).
+
+```{r, warning = FALSE, message = FALSE, echo=FALSE}
+setwd("C:/Users/dhihr/OneDrive/Inbio BBB WGS 2026")
+ta_8 <- read.csv('variants_summary.csv')%>% select(Gene, Pos, Ref, Alt, Effect, Impact, ProteinChange) %>% filter(Gene == 'HA' & Impact == 'MODERATE') %>% arrange(desc(Pos)) 
+
+ta_8_colored <- ta_8 %>%
+  mutate(
+    Impact = cell_spec(
+      Impact,
+      color = "white",
+      bold = TRUE,
+      background = case_when(
+        Impact == "LOW" ~ "#4CAF50",       
+        Impact == "MODERATE" ~ "#F39C12",  
+        Impact == "MODIFIER" ~ "#3498DB", 
+        TRUE ~ "gray"
+      )
+    )
+  )
+
+ta_8_colored %>%
+  kable(
+    format = "html",
+    escape = FALSE,
+    caption = "Table 8. SnpEff Variant Annotation and Functional Impact Assessment of HA"
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = FALSE,
+    position = "center",
+    font_size = 12
+  ) %>%
+  row_spec(0, bold = TRUE, background = "#D9EAF7")
+
+ta_9 <- read.csv('variants_summary.csv')%>% select(Gene, Pos, Ref, Alt, Effect, Impact, ProteinChange) %>% filter(Gene == 'PB2' & Impact == 'MODERATE') %>% arrange(desc(Pos)) 
+
+ta_9_colored <- ta_9 %>%
+  mutate(
+    Impact = cell_spec(
+      Impact,
+      color = "white",
+      bold = TRUE,
+      background = case_when(
+        Impact == "LOW" ~ "#4CAF50",       
+        Impact == "MODERATE" ~ "#F39C12",  
+        Impact == "MODIFIER" ~ "#3498DB", 
+        TRUE ~ "gray"
+      )
+    )
+  )
+
+ta_9_colored %>%
+  kable(
+    format = "html",
+    escape = FALSE,
+    caption = "Table 9. SnpEff Variant Annotation and Functional Impact Assessment of PB2"
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = FALSE,
+    position = "center",
+    font_size = 12
+  ) %>%
+  row_spec(0, bold = TRUE, background = "#D9EAF7")
+
+```
+
+Several moderate impact of important mutations were appeared in HA, Glu228Arg (G228a), HisGlyArg154GlnGlyLys (H154Q and R156K). Also, the important mutation were appeared in PB2, E627K in GluPro627LysGln.
+
+## Discussion
+
+A tiny fraction (0.55%) of our massive sequencing data mapped to the SRR35082533 as the human case of H5N1. The only major anomaly was the NS gene, where we only recovered about 40% of the sequence. This suggests several points: it suggests the virus has either deleted a portion of this gene or mutated it so heavily that our mapping tools couldn't recognize it, which can directly affect how the virus fights off the host's immune system.
+
+At the same time, we discovered that the Hemagglutinin (HA) gene is mutating much faster than the rest of the virus. Because these spikes are the main target for our immune system, the virus is under intense pressure to constantly change its shape and update can dodge our neutralizing antibodies. This rapid shifting is why the virus is so difficult to stop. Monitoring these rapid changes in the HA gene is absolutely critical for public health, clinical, and vaccine updates.
+
+In the HA gene, I found a highly concerning mutation at position 228 (G228A). This spot sits directly on the virus’s receptor binding indicating the virus has adapted in human respiratory receptors over avian ones, a mandatory step for airborne transmission. Also, indicating potential spillover transmission from avian to human, even though other study reveals that this mutation is insignificant in virus ability to infect human.[^3] [^4] [^5]
+
+[^3]: Hailiang Sun, Zifeng Pang, Cuishan Mai, Hejie Wang, Yutan Yang, Junkun Fan, Peiting Zhong, Wenrui Yan, Ming Liao, Genetic evolution, phylodynamic and phylogeographic of H5Ny AIVs in mammals, Animals and Zoonoses, Volume 1, Issue 1, 2025, Pages 69-85, ISSN 2950-2489, <https://doi.org/10.1016/j.azn.2024.10.001>.
+
+[^4]: Ayora-Talavera G, Shelton H, Scull MA, Ren J, Jones IM, Pickles RJ, Barclay WS. Mutations in H5N1 influenza virus hemagglutinin that confer binding to human tracheal airway epithelium. PLoS One. 2009 Nov 18;4(11):e7836. doi: 10.1371/journal.pone.0007836. PMID: 19924306; PMCID: PMC2775162.
+
+[^5]: Suttie A, Deng YM, Greenhill AR, Dussart P, Horwood PF, Karlsson EA. Inventory of molecular markers affecting biological characteristics of avian influenza A viruses. Virus Genes. 2019 Dec;55(6):739-768. doi: 10.1007/s11262-019-01700-z. Epub 2019 Aug 19. PMID: 31428925; PMCID: PMC6831541.
+
+Alongside this, a multiple mutation (H154Q and R156K) altered a critical region. This indicated the virus physically might replicate and has adapt in this human case. [^6]
+
+[^6]: Association of poultry vaccination with the interspecies transmission and molecular evolution of H5 subtype avian influenza virus. Bingying Li, Jayna Raghwani, Sarah C. Hill, Sarah François, Noémie Lefrancq, Yilin Liang, Zengmiao Wang, Lu Dong, Phillipe Lemey, Oliver G. Pybus, Huaiyu Tian. bioRxiv 2023.12.20.572711; doi: <https://doi.org/10.1101/2023.12.20.572711>
+
+Alarmingly, I identified the famous E627K mutation in the PB2 gene. This specific PB2 mutation acts as an engine upgrade allowing the virus transmission among mammals or humans, also spillover from birds.[^7] In fact this mutation also reported from cow cases, underscoring its role in expansion of host tropism.[^8]
+
+[^7]: Marchenko, V.Y., Panova, A.S., Kolosova, N.P. *et al.* Characterization of H5N1 avian influenza virus isolated from bird in Russia with the E627K mutation in the PB2 protein. Sci Rep 14, 26490 (2024). <https://doi.org/10.1038/s41598-024-78175-y>
+
+[^8]: Chakraborty C, Das A, Bhattacharya M, Islam MA. Emerging H5N1 mutations (PB2-D701N, PB2-E627K, HA-S110N, NA-V116X) in a recent outbreak in U.S. dairy cows: need for continuous monitoring. Ann Med Surg (Lond). 2025 Jul 16;87(8):5347-5350. doi: 10.1097/MS9.0000000000003538. PMID: 40787498; PMCID: PMC12333729.
+
+The low mapping rate of 0.55% in your H5N1 analysis is a significant limitation of this study. This might be happened the different host between reference (goose) and sequence (human/homo sapiens).

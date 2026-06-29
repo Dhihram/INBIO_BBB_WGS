@@ -1,0 +1,8 @@
+Kategori / Parameter,Hasil Analisis (H5N1),Keterangan
+Informasi Genom,Panjang Genom: 13.590 basa; Total Varian: 562,Secara keseluruhan genom terpetakan pada 8 kromosom/segmen.
+Tingkat Mutasi (Variant Rate),1 varian tiap 24 basa,Menunjukkan tingkat mutasi yang sangat tinggi terhadap referensi.
+Tipe Varian Dominan,SNP: 438 (78%); MNP: 124 (22%),Mutasi substitusi (pergantian basa) mendominasi seluruh varian; tidak ada insersi/delesi.
+Dampak Fungsional (Functional Class),"Silent: 414 (79,31%); Missense: 108 (20,69%)",Mayoritas mutasi tidak mengubah asam amino (Silent). Rasio Missense/Silent: 0.2609.
+Tingkat Keparahan (Impact),"LOW: 501 (52,30%); MODERATE: 167 (17,43%); MODIFIER: 290 (30,27%)",Mutasi Missense (berpotensi mengubah struktur protein) masuk dalam kategori MODERATE.
+Lokasi Mutasi Utama (Region),"EXON: 665 (69,42%); DOWNSTREAM: 202 (21,09%); UPSTREAM: 56 (5,85%)",Sebagian besar efek varian terlokalisasi di area pengkode protein (Exon).
+Kualitas Data,Errors: 0; Warnings: 112,"Tidak ada error fatal, namun 112 peringatan perlu dicek di file log untuk validasi anotasi."

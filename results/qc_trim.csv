@@ -1,0 +1,7 @@
+﻿Read,Read name,Total sequences,Retention vs raw,Read length,GC%,Per base quality,Adapter content,Per base content,Length Distribution,Duplication,Interpretasi
+R1,Raw,"22,410,947",100%,150,50,PASS,PASS,FAIL,PASS,FAIL,"Kualitas baik, tapi ada bias komposisi basa dan duplikasi"
+R1,Clean,"22,410,940",~100%,18–150,50,PASS,PASS,FAIL,FAIL,FAIL,"Hampir semua read tetap dipertahankan, tetapi ada read sangat pendek"
+R1,Clean l50,"22,408,473",99.99%,50–150,50,PASS,PASS,FAIL,FAIL,FAIL,Cleaning hanya menghapus sedikit read; kualitas tetap baik
+R2,Raw,"22,410,947",100%,150,50,PASS,PASS,WARNING,PASS,FAIL,Kualitas baik; sedikit bias komposisi basa
+R2,Clean,"22,410,940",~100%,31–150,50,PASS,PASS,WARNING,FAIL,FAIL,"Kualitas tetap baik, panjang read bervariasi"
+R2,Clean l50,"22,408,473",99.99%,50–150,50,PASS,PASS,WARNING,FAIL,FAIL,Cleaning mempertahankan hampir semua read
