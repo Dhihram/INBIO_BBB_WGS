@@ -28,9 +28,17 @@ Avian Influenza (A H5N1) became one of the public health concern. This virus fir
 
 [^2]: [https://cdn.who.int/media/docs/default-source/influenza/human-animal-interface-risk-assessments/updated-joint-fao-who-woah-public-health-assessment-of-recent-high-pathogenicity-avian-influenza-a(h5)-virus-events-in-animals-and-people--18-may-2026.pdf?sfvrsn=d660ff84_1&download=true](https://cdn.who.int/media/docs/default-source/influenza/human-animal-interface-risk-assessments/updated-joint-fao-who-woah-public-health-assessment-of-recent-high-pathogenicity-avian-influenza-a(h5)-virus-events-in-animals-and-people--18-may-2026.pdf?sfvrsn=d660ff84_1&download=true){.uri}
 
-This study aims to perform a comprehensive genomic analysis of a human A(H5N1) case by mapping its sequences to the reference strain GCF_000864105.1 (A/goose/Guangdong/1/1996(H5N1)). By identifying and annotating viral variants, we intend to characterize the genetic divergence of this isolate and identify key mutations in mammalian, potential adaptation, and potential changes in viral fitness.
+This study aims to perform a comprehensive genomic analysis of a human A(H5N1) case by mapping its sequences to the reference strain GCF_000864105.1 (A/goose/Guangdong/1/1996(H5N1)).[^3] By identifying and annotating viral variants, we intend to characterize the genetic divergence of this isolate and identify key mutations in mammalian, potential adaptation, and potential changes in viral fitness.
+
+[^3]: Xu X, Subbarao, Cox NJ, Guo Y. Genetic characterization of the pathogenic influenza A/Goose/Guangdong/1/96 (H5N1) virus: similarity of its hemagglutinin gene to those of H5N1 viruses from the 1997 outbreaks in Hong Kong. Virology. 1999 Aug 15;261(1):15-9. doi: 10.1006/viro.1999.9820. PMID: 10484749.
 
 ## Method
+
+```{r, echo=FALSE, out.width="50%"}
+knitr::include_graphics("inbios_bbb_6.drawio.png")
+```
+
+
 
 ### Data Acqusition
 
@@ -357,22 +365,26 @@ A tiny fraction (0.55%) of our massive sequencing data mapped to the SRR35082533
 
 At the same time, we discovered that the Hemagglutinin (HA) gene is mutating much faster than the rest of the virus. Because these spikes are the main target for our immune system, the virus is under intense pressure to constantly change its shape and update can dodge our neutralizing antibodies. This rapid shifting is why the virus is so difficult to stop. Monitoring these rapid changes in the HA gene is absolutely critical for public health, clinical, and vaccine updates.
 
-In the HA gene, I found a highly concerning mutation at position 228 (G228A). This spot sits directly on the virus’s receptor binding indicating the virus has adapted in human respiratory receptors over avian ones, a mandatory step for airborne transmission. Also, indicating potential spillover transmission from avian to human, even though other study reveals that this mutation is insignificant in virus ability to infect human.[^3] [^4] [^5]
+In the HA gene, I found a highly concerning mutation at position 228 (G228A). This spot sits directly on the virus’s receptor binding indicating the virus has adapted in human respiratory receptors over avian ones, a mandatory step for airborne transmission. Also, indicating potential spillover transmission from avian to human, even though other study reveals that this mutation is insignificant in virus ability to infect human.[^4] [^5] [^6]
 
-[^3]: Hailiang Sun, Zifeng Pang, Cuishan Mai, Hejie Wang, Yutan Yang, Junkun Fan, Peiting Zhong, Wenrui Yan, Ming Liao, Genetic evolution, phylodynamic and phylogeographic of H5Ny AIVs in mammals, Animals and Zoonoses, Volume 1, Issue 1, 2025, Pages 69-85, ISSN 2950-2489, <https://doi.org/10.1016/j.azn.2024.10.001>.
+[^4]: Hailiang Sun, Zifeng Pang, Cuishan Mai, Hejie Wang, Yutan Yang, Junkun Fan, Peiting Zhong, Wenrui Yan, Ming Liao, Genetic evolution, phylodynamic and phylogeographic of H5Ny AIVs in mammals, Animals and Zoonoses, Volume 1, Issue 1, 2025, Pages 69-85, ISSN 2950-2489, <https://doi.org/10.1016/j.azn.2024.10.001>.
 
-[^4]: Ayora-Talavera G, Shelton H, Scull MA, Ren J, Jones IM, Pickles RJ, Barclay WS. Mutations in H5N1 influenza virus hemagglutinin that confer binding to human tracheal airway epithelium. PLoS One. 2009 Nov 18;4(11):e7836. doi: 10.1371/journal.pone.0007836. PMID: 19924306; PMCID: PMC2775162.
+[^5]: Ayora-Talavera G, Shelton H, Scull MA, Ren J, Jones IM, Pickles RJ, Barclay WS. Mutations in H5N1 influenza virus hemagglutinin that confer binding to human tracheal airway epithelium. PLoS One. 2009 Nov 18;4(11):e7836. doi: 10.1371/journal.pone.0007836. PMID: 19924306; PMCID: PMC2775162.
 
-[^5]: Suttie A, Deng YM, Greenhill AR, Dussart P, Horwood PF, Karlsson EA. Inventory of molecular markers affecting biological characteristics of avian influenza A viruses. Virus Genes. 2019 Dec;55(6):739-768. doi: 10.1007/s11262-019-01700-z. Epub 2019 Aug 19. PMID: 31428925; PMCID: PMC6831541.
+[^6]: Suttie A, Deng YM, Greenhill AR, Dussart P, Horwood PF, Karlsson EA. Inventory of molecular markers affecting biological characteristics of avian influenza A viruses. Virus Genes. 2019 Dec;55(6):739-768. doi: 10.1007/s11262-019-01700-z. Epub 2019 Aug 19. PMID: 31428925; PMCID: PMC6831541.
 
-Alongside this, a multiple mutation (H154Q and R156K) altered a critical region. This indicated the virus physically might replicate and has adapt in this human case. [^6]
+Alongside this, a multiple mutation (H154Q and R156K) altered a critical region. This indicated the virus physically might replicate and has adapt in this human case. [^7]
 
-[^6]: Association of poultry vaccination with the interspecies transmission and molecular evolution of H5 subtype avian influenza virus. Bingying Li, Jayna Raghwani, Sarah C. Hill, Sarah François, Noémie Lefrancq, Yilin Liang, Zengmiao Wang, Lu Dong, Phillipe Lemey, Oliver G. Pybus, Huaiyu Tian. bioRxiv 2023.12.20.572711; doi: <https://doi.org/10.1101/2023.12.20.572711>
+[^7]: Association of poultry vaccination with the interspecies transmission and molecular evolution of H5 subtype avian influenza virus. Bingying Li, Jayna Raghwani, Sarah C. Hill, Sarah François, Noémie Lefrancq, Yilin Liang, Zengmiao Wang, Lu Dong, Phillipe Lemey, Oliver G. Pybus, Huaiyu Tian. bioRxiv 2023.12.20.572711; doi: <https://doi.org/10.1101/2023.12.20.572711>
 
-Alarmingly, I identified the famous E627K mutation in the PB2 gene. This specific PB2 mutation acts as an engine upgrade allowing the virus transmission among mammals or humans, also spillover from birds.[^7] In fact this mutation also reported from cow cases, underscoring its role in expansion of host tropism.[^8]
+Alarmingly, I identified the famous E627K mutation in the PB2 gene. This specific PB2 mutation acts as an engine upgrade allowing the virus transmission among mammals or humans, also spillover from birds.[^8] In fact this mutation also reported from cow cases, underscoring its role in expansion of host tropism.[^9]
 
-[^7]: Marchenko, V.Y., Panova, A.S., Kolosova, N.P. *et al.* Characterization of H5N1 avian influenza virus isolated from bird in Russia with the E627K mutation in the PB2 protein. Sci Rep 14, 26490 (2024). <https://doi.org/10.1038/s41598-024-78175-y>
+[^8]: Marchenko, V.Y., Panova, A.S., Kolosova, N.P. *et al.* Characterization of H5N1 avian influenza virus isolated from bird in Russia with the E627K mutation in the PB2 protein. Sci Rep 14, 26490 (2024). <https://doi.org/10.1038/s41598-024-78175-y>
 
-[^8]: Chakraborty C, Das A, Bhattacharya M, Islam MA. Emerging H5N1 mutations (PB2-D701N, PB2-E627K, HA-S110N, NA-V116X) in a recent outbreak in U.S. dairy cows: need for continuous monitoring. Ann Med Surg (Lond). 2025 Jul 16;87(8):5347-5350. doi: 10.1097/MS9.0000000000003538. PMID: 40787498; PMCID: PMC12333729.
+[^9]: Chakraborty C, Das A, Bhattacharya M, Islam MA. Emerging H5N1 mutations (PB2-D701N, PB2-E627K, HA-S110N, NA-V116X) in a recent outbreak in U.S. dairy cows: need for continuous monitoring. Ann Med Surg (Lond). 2025 Jul 16;87(8):5347-5350. doi: 10.1097/MS9.0000000000003538. PMID: 40787498; PMCID: PMC12333729.
 
 The low mapping rate of 0.55% in your H5N1 analysis is a significant limitation of this study. This might be happened the different host between reference (goose) and sequence (human/homo sapiens).
+
+## Supplement Materials
+
+Code and summary of output files can be accessed on <https://github.com/Dhihram/INBIO_BBB_WGS>
