@@ -46,7 +46,9 @@ The data is then trimmed to clean the reads from adapters and low-quality bases.
 
 ### Post-Trimming Quality Control
 
-The trimmed sequences are evaluated again using `fastqc` and `multiqc`. The best trimming results will be used for the subsequent steps in the pipeline. Download Reference and Indexing
+The trimmed sequences are evaluated again using `fastqc` and `multiqc`. The best trimming results will be used for the subsequent steps in the pipeline.
+
+### Download Reference and Indexing
 
 The reference genome is retrieved from NCBI using the RefSeq ID: GCF_000864105.1 and is then renamed to `reference.fna` for indexing.
 
