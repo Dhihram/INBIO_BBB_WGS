@@ -1,0 +1,144 @@
+##Step 1
+
+#Working Dir
+conda activate wgs
+mkdir -p ~/wgs/taskproject && cd ~/wgs/taskproject
+
+# Download
+prefetch SRR35082533
+fasterq-dump --split-files SRR35082533/SRR35082533.sra
+
+# Quality check
+fastqc SRR35082533_1.fastq -o .
+fastqc SRR35082533_2.fastq -o .
+
+# MultiQC
+multiqc . -o .
+
+# Trimming — paired-end (Copy-paste & running semuanya)
+fastp \
+  -i SRR35082533_1.fastq -I SRR35082533_2.fastq \
+  -o sample_clean_1_x.fastq -O sample_clean_2_x.fastq \
+  --detect_adapter_for_pe \
+  --html fastp_report_x.html --json fastp_report_x.json
+
+#Optional trimming
+fastp \
+  -i SRR35082533_1.fastq -I SRR35082533_2.fastq \
+  -o sample_clean_1.fastq -O sample_clean_2.fastq \
+  --detect_adapter_for_pe \
+  -l 50 \
+  --html fastp_report.html \
+  --json fastp_report.json
+
+# Cek report Fastp
+explorer.exe fastp_report_x.html
+explorer.exe fastp_report.html
+
+# QC after trimming
+fastqc sample_clean_1_x.fastq -o .
+fastqc sample_clean_2_x.fastq -o .
+
+fastqc sample_clean_1.fastq -o .
+fastqc sample_clean_2.fastq -o .
+
+# MultiQC trimming
+multiqc fastp_report_x.json sample_clean_1_x_fastqc.zip sample_clean_2_x_fastqc.zip -o multiqc_trim1_report
+multiqc fastp_report.json sample_clean_1_fastqc.zip sample_clean_2_fastqc.zip -o multiqc_trim2_report
+
+# Download terlebih dahulu reference genome 
+wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/864/105/GCF_000864105.1_ViralMultiSegProj15617/GCF_000864105.1_ViralMultiSegProj15617_genomic.fna.gz
+
+# Gunzip
+gunzip GCF_000864105.1_ViralMultiSegProj15617_genomic.fna.gz
+
+# Rename reference genome
+mv GCF_000864105.1_ViralMultiSegProj15617_genomic.fna reference.fna
+
+# Index reference
+bwa index reference.fna
+
+# Alignment — paired-end
+bwa mem reference.fna sample_clean_1.fastq sample_clean_2.fastq > alignment.sam
+#alternative
+bwa mem reference.fna SRR35082533_1.fastq SRR35082533_2.fastq > alignment.sam
+
+
+# SAM → BAM
+samtools view -Sb alignment.sam > alignment.bam
+
+# Sort
+samtools sort alignment.bam -o alignment_sorted.bam
+
+# Index
+samtools index alignment_sorted.bam
+
+
+# QC
+samtools flagstat alignment_sorted.bam > output_gabungan.txt
+samtools coverage alignment_sorted.bam >> output_gabungan.txt
+samtools quickcheck alignment_sorted.bam && echo "OK"
+
+# Variant calling (Copy-paste & running semuanya)
+freebayes \
+  -f reference.fna \
+  --min-mapping-quality 20 \
+  --min-base-quality 20 \
+  --min-coverage 10 \
+  alignment_sorted.bam > variants_raw.vcf
+
+
+# Filter (Copy-paste & running semuanya)
+bcftools filter \
+  -e 'QUAL < 30 || INFO/DP < 10 || AF < 0.1' \
+  variants_raw.vcf -o variants_filtered.vcf
+
+# Mengecek total varian
+grep -vc "^#" variants_raw.vcf
+grep -vc "^#" variants_filtered.vcf
+
+# Normalize
+bcftools norm -f reference.fna -m- variants_filtered.vcf -o variants_norm.vcf
+
+# Mengecek vcf yang sudah dinormalisasi
+grep "^#CHROM" variants_norm.vcf && grep -v "^#" variants_norm.vcf | head -5
+
+#Melakukan download anotasi
+wget -O reference.gbff.gz \
+https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/864/105/GCF_000864105.1_ViralMultiSegProj15617/GCF_000864105.1_ViralMultiSegProj15617_genomic.gbff.gz
+
+gunzip reference.gbff.gz
+
+#menentukan lokasi snpEff
+which snpEff
+
+find /home/dhihram/miniconda3/envs/wgs -name snpEff.config
+
+#Custom SNPEFF
+SNPDIR=/home/dhihram/miniconda3/envs/wgs/share/snpeff-5.3.0a-0
+
+mkdir -p $SNPDIR/data/H5N1
+
+cp reference.fna $SNPDIR/data/H5N1/sequences.fa
+cp reference.gbff $SNPDIR/data/H5N1/genes.gbk
+
+echo "H5N1.genome : Influenza_A_H5N1" >> $SNPDIR/snpEff.config
+
+snpEff build -genbank -v H5N1
+
+#Melakukan anotasi
+snpEff ann -v \
+  -stats snpEff_summary.html \
+  -csvStats snpEff_summary.csv \
+  H5N1 \
+  variants_norm.vcf > variants_annotated.vcf
+
+#Summary Anotasi
+echo "Chrom,Pos,Ref,Alt,Effect,Impact,Gene,ProteinChange" > variants_summary.csv
+
+bcftools query \
+-f '%CHROM\t%POS\t%REF\t%ALT\t%INFO/ANN\n' variants_annotated.vcf |
+awk -F'\t' 'BEGIN{OFS=","}{
+    split($5,a,"|");
+    print $1,$2,$3,$4,a[2],a[3],a[4],a[11]
+}' >> variants_summary.csv
