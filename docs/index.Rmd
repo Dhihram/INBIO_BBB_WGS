@@ -60,7 +60,7 @@ The alignment results, initially in SAM format, are converted into BAM format. N
 
 Next, an assessment is performed to check the percentage of mapped reads and the read coverage for each segment/reference.
 
-### Variant calling
+### Variant Calling
 
 Variant calling is performed to identify differences between the sample and the reference genome. This outputs a `variants_raw.vcf` file using the following parameters:
 
@@ -82,7 +82,7 @@ Subsequently, variant filtering is performed to remove variants based on the fol
 
 The `.gbff` data file is downloaded for the NCBI reference GCF_000864105.1. The database is then customized for H5N1 by copying the `.fna` and `.gbff` files into the H5N1 directory within the SnpEff configuration.
 
-### Annotate variants
+### Annotate Variants
 
 SnpEff is used to perform variant annotation to identify: synonymous variants, missense variants, stop-gained mutations, mutation positions within the gene, amino acid changes, and affected genes.
 
@@ -188,7 +188,7 @@ colnames(ta_3) <- gsub("\\.", "", colnames(ta_3))
 
 ta_4 %>% kable(
     format = "html",
-    caption = "Table 4. Genome coverage and depth per region"
+    caption = "Table 4. Genome coverage and depth per genes"
   ) %>%
   kable_styling(
     bootstrap_options = c("striped", "hover", "condensed", "responsive"),
